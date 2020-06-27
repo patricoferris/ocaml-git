@@ -162,7 +162,7 @@ struct
           Log.debug (fun l -> l "Retrieve end of the PACK stream.") ;
           push None ;
           Lwt.return (Ok ())
-      | Error err -> Lwt.return (Error (`Smart err))
+      | Error err -> Log.err (fun f -> f "It all went wrong for the first one!"); Lwt.return (Error (`Smart err))
     in
     dispatch ()
     >?= fun () ->
@@ -510,7 +510,7 @@ struct
               consume (Web.Response.body resp)
                 (Decoder.decode decoder Decoder.NegociationResult)
               >>= function
-              | Error err -> Lwt.return (Error (`Smart err))
+                      | Error err -> Log.err (fun f -> f "All went to shizzle here"); Lwt.return (Error (`Smart err))
               | Ok _ ->
                   (* TODO: check negociation result. *)
                   let stream () =
@@ -543,7 +543,7 @@ struct
                       (Decoder.decode decoder
                          (Decoder.Negociation (have, ack_mode)))
                     >>= function
-                    | Error err -> Lwt.return (Error (`Smart err))
+                            | Error err -> Log.err (fun f -> f "All went to shit here :("); Lwt.return (Error (`Smart err))
                     | Ok acks ->
                         Log.debug (fun l ->
                             l "Final ACK response received: %a." Common.pp_acks
@@ -559,7 +559,7 @@ struct
                       (Decoder.decode decoder
                          (Decoder.Negociation (have, ack_mode)))
                     >>= function
-                    | Error err -> Lwt.return (Error (`Smart err))
+                            | Error err -> Log.err (fun f -> f "Maybe it all went to shit here?"); Lwt.return (Error (`Smart err))
                     | Ok acks -> (
                         Log.debug (fun l ->
                             l "ACK response received: %a." Common.pp_acks acks
